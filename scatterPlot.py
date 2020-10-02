@@ -59,6 +59,7 @@ with open(filePath) as openFile:
 			])'''
 			#fig.add_trace(px.scatter_3d(dataFrame, x='x_axis', y='y_axis', z='z_axis', color='drone_id')) 
 			fig.add_trace(go.Scatter3d(x=xAxis[:-1], y=yAxis[:-1], z=zAxis[:-1]))
+			fig.data[-1].visible = False
 			xAxis = [xAxis[-1]]
 			yAxis = [yAxis[-1]]
 			zAxis = [zAxis[-1]]
@@ -68,8 +69,6 @@ with open(filePath) as openFile:
 # makes first trace frame visible
 print(fig.data)
 fig.data[0].visible = True
-fig.data[1].visible = False 
-fig.data[2].visible = False
 
 
 steps = []
@@ -93,9 +92,9 @@ fig.update_layout(
 	title_text='Drone Data Visualization', 
 	sliders=sliders,
 	scene = dict(
-		xaxis = dict(nticks=5, range=[-50,50]),
-    yaxis = dict(nticks=5, range=[0,50]),
-    zaxis = dict(nticks=5, range=[-50,50])
+		xaxis = dict(nticks=5, range=[-30,30]),
+    yaxis = dict(nticks=5, range=[-30,30]),
+    zaxis = dict(nticks=5, range=[0,30])
 	)
 )
 pio.write_html(fig, file='./drone_simulation.html', auto_open=True)
