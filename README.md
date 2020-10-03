@@ -5,6 +5,7 @@ Make sure to install the following:
 1) Pip3
 2) Python3
 3) Plotly 4.10.0 
+4) Pandas
 
 If it is still not running make sure these are installed: 
   astroid           2.4.2  
