@@ -29,7 +29,7 @@ class Drone:
 				if trailTime < 0:
 					break
 				#self.update(trailTime, True, 100 * (200 - i) / 100)
-				self.update(trailTime, True, 120)
+				self.update(trailTime, True, 40)
 				
 				
 		before = 0.0
@@ -63,7 +63,7 @@ class Drone:
 		if trail:
 			#pygame.draw.circle(screen, (0, 0, 0), (pos[0], pos[1]), 10)	
 			s = pygame.Surface((4, 4), pygame.SRCALPHA)
-			s.fill((0, 0, 255, alpha))
+			s.fill((255, 255, 40, alpha))
 			#pos[0] -= pos[0] % 10
 			#pos[1] -= pos[1] % 10
 			screen.blit(s, pos)
@@ -181,7 +181,7 @@ pygame.display.set_caption("Drone Visualization Tool")
 # slider bar for scolling through time
 bar = pygame.image.load("images/bar.png")
 barRect = bar.get_rect()
-barRect.center = [screen.get_width() / 2, barRect.height]
+barRect.center = [int(screen.get_width() / 2), int(barRect.height)]
 slider = pygame.image.load("images/slider.png")
 sliderRect = slider.get_rect()
 sliderPercent = 0.0
@@ -337,12 +337,41 @@ while True:
 			#pygame.draw.line(screen, (0, 0, 255), beg, end, 3)	
 			screen.blit(txt, rect)	
 
+	# top tool bar
+	img = pygame.Surface((screen.get_width(), 74), pygame.SRCALPHA)
+	img.fill((150, 150, 150, 128))
+	rect = img.get_rect()
+	rect.left = 0
+	rect.top = 0
+	screen.blit(img, rect)
+	pygame.draw.line(screen, (150, 150, 150), (0, rect.bottom), (screen.get_width(), rect.bottom), 4)
 
 	# slider graphics
 	screen.blit(bar, barRect)
 	sliderRect.centerx = int(barRect.left + sliderPercent * barRect.width)
 	sliderRect.centery = barRect.centery
 	screen.blit(slider, sliderRect)
+
+	# min time
+	txt = font.render("0.0 s", True, (0, 0, 0))
+	rect = txt.get_rect()
+	rect.right = barRect.left - 10
+	rect.centery = barRect.centery
+	screen.blit(txt, rect)
+
+	# max time
+	txt = font.render(str(round(maxTime, 1)) + " s", True, (0, 0, 0))
+	rect = txt.get_rect()
+	rect.left = barRect.right + 10
+	rect.centery = barRect.centery
+	screen.blit(txt, rect)
+
+	# current time
+	txt = font.render(str(round(time, 1)) + " s", True, (0, 0, 0))
+	rect = txt.get_rect()
+	rect.centerx = sliderRect.centerx
+	rect.top = barRect.bottom + 4
+	screen.blit(txt, rect)
 
 
 	# keep track of current time in simulation
@@ -352,4 +381,5 @@ while True:
 
 	# display changes
 	pygame.display.flip()
+
 
