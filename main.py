@@ -18,10 +18,19 @@ class Drone:
 		self.img = pygame.image.load("images/drone.png")
 		self.rect = self.img.get_rect()
 
-	def update(self):
+	def update(self, time, trail=False):
 
-		global x, y, scale, metersPerUnit, pixelsPerUnit, time, screen
-		
+		global x, y, scale, metersPerUnit, pixelsPerUnit, screen
+
+		if not trail:
+			trailTime = time
+			for i in range(0, 10):
+				trailTime -= 1.0
+				if trailTime < 0:
+					break
+				self.update(trailTime, True)
+				
+				
 		before = 0.0
 		after = 0.0
 		i = 0
@@ -47,8 +56,12 @@ class Drone:
 		posX = self.x[i - 1] + interFactor * (self.x[i] - self.x[i-1])
 		posY = self.y[i - 1] + interFactor * (self.y[i] - self.y[i-1])
 		pos = pos_to_grid([posX, posY])
-		self.rect.center = pos
-		screen.blit(self.img, self.rect)
+		
+		if trail:
+			pass
+		else:
+			self.rect.center = pos
+			screen.blit(self.img, self.rect)
 
 			
 		
@@ -56,6 +69,8 @@ class Drone:
 
 
 def load_data(filename):
+
+	global maxTime
 	
 	drones = []
 
@@ -83,6 +98,9 @@ def load_data(filename):
 		drone.z.append(int(line[5]))
 		drone.life.append(int(line[6]))
 		drones.append(drone)
+
+		if drone.time[-1] > maxTime:
+			maxTime = drone.time[-1] 
 			
 	return drones
 
@@ -97,10 +115,15 @@ def draw_grid(screen):
 	for i in range(-1, rows):
 		rowOffset = y / metersPerUnit
 		rowOffset *= pixelsPerUnit
+		boldOffset = rowOffset
 		rowOffset = -(rowOffset % pixelsPerUnit)
 		rowY = i * pixelsPerUnit
 		rowY += rowOffset
-		pygame.draw.line(screen, (70, 70, 70), (0, rowY), (screen.get_width(), rowY), 1) 
+		bold = False
+		if bold:
+			pygame.draw.line(screen, (0, 0, 0), (0, rowY), (screen.get_width(), rowY), 2) 
+		else:	
+			pygame.draw.line(screen, (70, 70, 70), (0, rowY), (screen.get_width(), rowY), 1) 
 
 	# draws columns
 	cols = int(screen.get_width() / pixelsPerUnit)
@@ -143,11 +166,23 @@ def unit(v):
 pygame.init()
 font = pygame.font.Font("Azonix.otf", 12)
 
-# read drone data from file
-drones = load_data("data.txt") 
+# sets up screen
+screen = pygame.display.set_mode((800, 600))
+pygame.display.set_caption("Drone Visualization Tool")
+
+# slider bar for scolling through time
+bar = pygame.image.load("images/bar.png")
+barRect = bar.get_rect()
+barRect.center = [screen.get_width() / 2, barRect.height]
+slider = pygame.image.load("images/slider.png")
+sliderRect = slider.get_rect()
+sliderPercent = 0.0
+
 
 # used for time simulation 
 time = 0.1
+minTime = 0.0
+maxTime = 0.0
 deltaTime = 0.0
 timeScale = 1.0
 x = -20.0
@@ -158,6 +193,9 @@ pixelsPerUnitStart = 100
 pixelsPerUnit = pixelsPerUnitStart 
 clock = pygame.time.Clock()
 
+# read drone data from file
+drones = load_data("data.txt") 
+
 mouseDrag = False
 mouseZoom = False
 mousePressed = False
@@ -167,9 +205,6 @@ mousePressed = False
 background = pygame.image.load("images/background.png")
 
 
-# sets up screen
-screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Drone Visualization Tool")
 
 # event loop
 while True:
@@ -178,6 +213,10 @@ while True:
 			sys.exit()
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1:
+				if (event.pos[0] >= barRect.left - 20 and event.pos[0] <= barRect.right + 20 and event.pos[1] >= barRect.top and event.pos[1] <= barRect.bottom): 
+					pressedElement = "slider"
+				else:
+					pressedElement = "none"
 				mousePressedPos = event.pos
 				mousePressed = True
 			elif event.button == 2:
@@ -252,37 +291,56 @@ while True:
 
 	# draw latest stuff
 	for drone in drones:
-		drone.update()
+		drone.update(time)
 
-	# left click for measurements
 	if mousePressed:
-		
+
 		posX, posY = pygame.mouse.get_pos()
-		dx = posX - mousePressedPos[0]
-		dx /= pixelsPerUnit
-		dx *= metersPerUnit
-		dy = posY - mousePressedPos[1]	
-		dy /= pixelsPerUnit
-		dy *= metersPerUnit
-		dist = math.sqrt(dx*dx + dy*dy)
-		txt = font.render(str(round(dist, 1)) + " m", True, (0, 0, 0))	
-		rect = txt.get_rect()
-		perp = unit([dx, dy])
-		perp = [perp[1], -perp[0]]
-		if perp[1] >= 0:
-			perp = [-perp[0], -perp[1]]
-		cenX = ((mousePressedPos[0] + posX) / 2) + perp[0] * 40
-		cenY = ((mousePressedPos[1] + posY) / 2) + perp[1] * 40
-		rect.center = [cenX, cenY]
-		pygame.draw.line(screen, (0, 0, 255), mousePressedPos, (posX, posY), 2)	
-		#beg = (mousePressedPos[0] + perp[0] * 5, mousePressedPos[1] + perp[1] * 4)
-		#end = (mousePressedPos[0] - perp[0] * 5, mousePressedPos[1] - perp[1] * 4)
-		#pygame.draw.line(screen, (0, 0, 255), beg, end, 3)	
-		screen.blit(txt, rect)
+
+		# slider controls time		
+		if pressedElement == "slider":
+			sliderPercent = (posX - barRect.left) / (barRect.right - barRect.left)
+			if sliderPercent > 1.0:
+				sliderPercent = 1.0
+			elif sliderPercent < 0:
+				sliderPercent = 0
+
+		# left click for measurements
+		else:
+			dx = posX - mousePressedPos[0]
+			dx /= pixelsPerUnit
+			dx *= metersPerUnit
+			dy = posY - mousePressedPos[1]	
+			dy /= pixelsPerUnit
+			dy *= metersPerUnit
+			dist = math.sqrt(dx*dx + dy*dy)
+			txt = font.render(str(round(dist, 1)) + " m", True, (0, 0, 0))	
+			rect = txt.get_rect()
+			perp = unit([dx, dy])
+			perp = [perp[1], -perp[0]]
+			if perp[1] >= 0:
+				perp = [-perp[0], -perp[1]]
+			cenX = ((mousePressedPos[0] + posX) / 2) + perp[0] * 40
+			cenY = ((mousePressedPos[1] + posY) / 2) + perp[1] * 40
+			rect.center = [cenX, cenY]
+			pygame.draw.line(screen, (0, 0, 255), mousePressedPos, (posX, posY), 2)	
+			#beg = (mousePressedPos[0] + perp[0] * 5, mousePressedPos[1] + perp[1] * 4)
+			#end = (mousePressedPos[0] - perp[0] * 5, mousePressedPos[1] - perp[1] * 4)
+			#pygame.draw.line(screen, (0, 0, 255), beg, end, 3)	
+			screen.blit(txt, rect)	
+
+
+	# slider graphics
+	screen.blit(bar, barRect)
+	sliderRect.centerx = int(barRect.left + sliderPercent * barRect.width)
+	sliderRect.centery = barRect.centery
+	screen.blit(slider, sliderRect)
+
 
 	# keep track of current time in simulation
 	deltaTime = clock.tick() * timeScale
 	#time += deltaTime
+	time = sliderPercent * maxTime
 
 	# display changes
 	pygame.display.flip()
