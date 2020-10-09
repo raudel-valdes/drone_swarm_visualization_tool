@@ -18,17 +18,18 @@ class Drone:
 		self.img = pygame.image.load("images/drone.png")
 		self.rect = self.img.get_rect()
 
-	def update(self, time, trail=False):
+	def update(self, time, trail=False, alpha=0):
 
 		global x, y, scale, metersPerUnit, pixelsPerUnit, screen
 
 		if not trail:
-			trailTime = time
-			for i in range(0, 10):
-				trailTime -= 1.0
+			trailTime = time - time % 10
+			for i in range(1, 1000):
+				trailTime -= 10 
 				if trailTime < 0:
 					break
-				self.update(trailTime, True)
+				#self.update(trailTime, True, 100 * (200 - i) / 100)
+				self.update(trailTime, True, 120)
 				
 				
 		before = 0.0
@@ -56,9 +57,16 @@ class Drone:
 		posX = self.x[i - 1] + interFactor * (self.x[i] - self.x[i-1])
 		posY = self.y[i - 1] + interFactor * (self.y[i] - self.y[i-1])
 		pos = pos_to_grid([posX, posY])
+		pos[0] = int(pos[0])
+		pos[1] = int(pos[1])
 		
 		if trail:
-			pass
+			#pygame.draw.circle(screen, (0, 0, 0), (pos[0], pos[1]), 10)	
+			s = pygame.Surface((4, 4), pygame.SRCALPHA)
+			s.fill((0, 0, 255, alpha))
+			#pos[0] -= pos[0] % 10
+			#pos[1] -= pos[1] % 10
+			screen.blit(s, pos)
 		else:
 			self.rect.center = pos
 			screen.blit(self.img, self.rect)
@@ -123,7 +131,7 @@ def draw_grid(screen):
 		if bold:
 			pygame.draw.line(screen, (0, 0, 0), (0, rowY), (screen.get_width(), rowY), 2) 
 		else:	
-			pygame.draw.line(screen, (70, 70, 70), (0, rowY), (screen.get_width(), rowY), 1) 
+			pygame.draw.line(screen, (40, 40, 40), (0, rowY), (screen.get_width(), rowY), 1) 
 
 	# draws columns
 	cols = int(screen.get_width() / pixelsPerUnit)
@@ -134,7 +142,7 @@ def draw_grid(screen):
 		colOffset = -(colOffset % pixelsPerUnit)
 		colX = i * pixelsPerUnit
 		colX += colOffset
-		pygame.draw.line(screen, (70, 70, 70), (colX, 0), (colX, screen.get_height()), 1) 
+		pygame.draw.line(screen, (40, 40, 40), (colX, 0), (colX, screen.get_height()), 1) 
 
 
 def pos_to_grid(pos):
@@ -164,10 +172,10 @@ def unit(v):
 		
 
 pygame.init()
-font = pygame.font.Font("Azonix.otf", 12)
+font = pygame.font.Font("Azonix.otf", 16)
 
 # sets up screen
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((1200, 700))
 pygame.display.set_caption("Drone Visualization Tool")
 
 # slider bar for scolling through time
@@ -254,7 +262,7 @@ while True:
 	
 	# right click mouse drag for repositioning	
 	if mouseDrag:
-		scrollFactor = 2.0
+		scrollFactor = 1.22
 		posX, posY = pygame.mouse.get_pos()
 		dx = posX - mouseDragPos[0]
 		dx /= pixelsPerUnit
