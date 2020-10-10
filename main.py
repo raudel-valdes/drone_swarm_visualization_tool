@@ -175,7 +175,7 @@ pygame.init()
 font = pygame.font.Font("Azonix.otf", 16)
 
 # sets up screen
-screen = pygame.display.set_mode((1200, 700))
+screen = pygame.display.set_mode((1000, 700))
 pygame.display.set_caption("Drone Visualization Tool")
 
 # slider bar for scolling through time
@@ -275,10 +275,6 @@ while True:
 
 	# erase screen
 	screen.blit(background, (0, 0))
-
-	draw_grid(screen)
-
-			
 	
 	# right click mouse drag for repositioning	
 	if mouseDrag:
@@ -314,10 +310,9 @@ while True:
 		x = mouseZoomCenter[0] - offsetX
 		y = mouseZoomCenter[1] - offsetY
 		
-		
-
 
 	# draw latest stuff
+	draw_grid(screen)
 	for drone in drones:
 		drone.update(time)
 
