@@ -78,7 +78,8 @@ for i in range(0, len(fig.data)):
 		args=[{"visible":[False] * len(fig.data)},
 					{"title":"Should have switched to frame" + str(i)}]
 	)
-	step["args"][0]["visible"][i] = True
+	for j in range(0, i + 1):
+		step["args"][0]["visible"][j] = True
 	steps.append(step)
 sliders = [dict(
     active=0,
