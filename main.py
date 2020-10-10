@@ -329,7 +329,7 @@ while True:
 
 		# slider controls time		
 		if pressedElement == "slider":
-			sliderPercent = (posX - barRect.left) / (barRect.right - barRect.left)
+			sliderPercent = float(posX - barRect.left) / float(barRect.right - barRect.left)
 			if sliderPercent > 1.0:
 				sliderPercent = 1.0
 			elif sliderPercent < 0:
