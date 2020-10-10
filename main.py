@@ -169,8 +169,6 @@ def unit(v):
 	v2[0] /= mag(v)
 	v2[1] /= mag(v)
 	return v2
-
-def angleOf(
 		
 
 pygame.init()
