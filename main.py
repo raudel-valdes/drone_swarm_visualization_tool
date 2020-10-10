@@ -169,6 +169,8 @@ def unit(v):
 	v2[0] /= mag(v)
 	v2[1] /= mag(v)
 	return v2
+
+def angleOf(
 		
 
 pygame.init()
@@ -185,6 +187,13 @@ barRect.center = [int(screen.get_width() / 2), int(barRect.height)]
 slider = pygame.image.load("images/slider.png")
 sliderRect = slider.get_rect()
 sliderPercent = 0.0
+
+# play/pause buttons
+play = pygame.image.load("images/play.png")
+playRect = play.get_rect()
+pause = pygame.image.load("images/play.png")
+pauseRect = pause.get_rect()
+playing = False
 
 
 # used for time simulation 
@@ -209,7 +218,7 @@ mouseZoom = False
 mousePressed = False
 
 
-# loads image
+# loads background 
 background = pygame.image.load("images/background.png")
 
 
@@ -221,8 +230,9 @@ while True:
 			sys.exit()
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1:
-				if (event.pos[0] >= barRect.left - 20 and event.pos[0] <= barRect.right + 20 and event.pos[1] >= barRect.top and event.pos[1] <= barRect.bottom): 
+				if event.pos[0] >= barRect.left - 20 and event.pos[0] <= barRect.right + 20 and event.pos[1] >= barRect.top and event.pos[1] <= barRect.bottom: 
 					pressedElement = "slider"
+					playing = False
 				else:
 					pressedElement = "none"
 				mousePressedPos = event.pos
@@ -250,6 +260,18 @@ while True:
 				mouseZoom = False
 			elif event.button == 3:
 				mouseDrag = False 
+
+		elif event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_RIGHT:
+				timeScale *= 2 
+			elif event.key == pygame.K_LEFT:
+				timeScale /= 2 
+			elif event.key == pygame.K_SPACE:
+				if playing:
+					playing = False
+				else:
+					playing = True
+				
 
 	pixelsPerUnit = pixelsPerUnitStart * scale
 
@@ -373,11 +395,35 @@ while True:
 	rect.top = barRect.bottom + 4
 	screen.blit(txt, rect)
 
+	# time scale
+	txt = font.render(str(round(timeScale, 1)) + "x", True, (0, 0, 0))
+	rect = txt.get_rect()
+	rect.centery = sliderRect.centery
+	rect.left = 10 
+	screen.blit(txt, rect)
+
+	# play pause button
+	'''if playing:
+		img = pause
+		rect = pauseRect
+	else:
+		img = play
+		rect = playRect
+	rect.left = 10
+	rect.centery = sliderRect.centery
+	screen.blit(img, rect)'''
 
 	# keep track of current time in simulation
 	deltaTime = clock.tick() * timeScale
-	#time += deltaTime
-	time = sliderPercent * maxTime
+	deltaTime /= 1000
+	if playing:
+		time += deltaTime
+		if time > maxTime:
+			time = maxTime 
+			playing = False
+		sliderPercent = time / maxTime
+	else:
+		time = sliderPercent * maxTime
 
 	# display changes
 	pygame.display.flip()
