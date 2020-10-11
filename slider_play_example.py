@@ -3,14 +3,14 @@ import plotly.graph_objects as go
 import pandas as pd
 
 dataset = pd.read_csv('./droneData_xAxis_newFormat.txt')
-
+print(dataset)
 frames = ["0", "1", "2", "3", "4"]
 
-# make list of continents
-continents = []
-for continent in dataset["continent"]:
-    if continent not in continents:
-        continents.append(continent)
+# make list of drone sets
+droneIds = []
+for droneId in dataset["droneId"]:
+    if droneId not in droneIds:
+        droneIds.append(droneId)
 # make figure
 fig_dict = {
     "data": [],
@@ -19,7 +19,7 @@ fig_dict = {
 }
 
 # fill in most of layout
-fig_dict["layout"]["xaxis"] = {"range": [30, 85], "title": "Life Expectancy"}
+fig_dict["layout"]["xaxis"] = {"range": [0, 85], "title": "Life Expectancy"}
 fig_dict["layout"]["yaxis"] = {"title": "GDP per Capita", "type": "log"}
 fig_dict["layout"]["hovermode"] = "closest"
 fig_dict["layout"]["updatemenus"] = [
@@ -70,56 +70,54 @@ sliders_dict = {
 }
 
 # make data
-year = 1952
-for continent in continents:
-    dataset_by_year = dataset[dataset["year"] == year]
-    dataset_by_year_and_cont = dataset_by_year[
-        dataset_by_year["continent"] == continent]
+frame = 0
+for droneId in droneIds:
+    dataset_by_frame = dataset[dataset["frame"] == frame]
+    dataset_by_frame_and_droneId = dataset_by_frame[
+        dataset_by_frame["droneId"] == droneId]
 
     data_dict = {
-        "x": list(dataset_by_year_and_cont["lifeExp"]),
-        "y": list(dataset_by_year_and_cont["gdpPercap"]),
+        "x": list(dataset_by_frame_and_droneId["xAxis"]),
+        "y": list(dataset_by_frame_and_droneId["yAxis"]),
         "mode": "markers",
-        "text": list(dataset_by_year_and_cont["country"]),
+        "text": list(dataset_by_frame_and_droneId["droneId"]),
         "marker": {
             "sizemode": "area",
             "sizeref": 200000,
-            "size": list(dataset_by_year_and_cont["pop"])
         },
-        "name": continent
+        "name": droneId
     }
     fig_dict["data"].append(data_dict)
 
 # make frames
-for year in years:
-    frame = {"data": [], "name": str(year)}
-    for continent in continents:
-        dataset_by_year = dataset[dataset["year"] == int(year)]
-        dataset_by_year_and_cont = dataset_by_year[
-            dataset_by_year["continent"] == continent]
+for frame in frames:
+    frameTemp = {"data": [], "name": str(frame)}
+    for droneId in droneIds:
+        dataset_by_frame = dataset[dataset["frame"] == int(frame)]
+        dataset_by_frame_and_droneId = dataset_by_frame[
+            dataset_by_frame["droneId"] == droneId]
 
         data_dict = {
-            "x": list(dataset_by_year_and_cont["lifeExp"]),
-            "y": list(dataset_by_year_and_cont["gdpPercap"]),
+            "x": list(dataset_by_frame_and_droneId["xAxis"]),
+            "y": list(dataset_by_frame_and_droneId["yAxis"]),
             "mode": "markers",
-            "text": list(dataset_by_year_and_cont["country"]),
+            "text": list(dataset_by_frame_and_droneId["droneId"]),
             "marker": {
                 "sizemode": "area",
                 "sizeref": 200000,
-                "size": list(dataset_by_year_and_cont["pop"])
             },
-            "name": continent
+            "name": droneId
         }
-        frame["data"].append(data_dict)
+        frameTemp["data"].append(data_dict)
 
-    fig_dict["frames"].append(frame)
+    fig_dict["frames"].append(frameTemp)
     slider_step = {"args": [
-        [year],
+        [frame],
         {"frame": {"duration": 300, "redraw": False},
          "mode": "immediate",
          "transition": {"duration": 300}}
     ],
-        "label": year,
+        "label": frame,
         "method": "animate"}
     sliders_dict["steps"].append(slider_step)
 
