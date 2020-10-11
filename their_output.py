@@ -1,147 +1,4 @@
-import plotly.io as pio
-import plotly.express as px
-import plotly.graph_objects as go
-import pandas as pd
-
-fig_dict = {
-    "data": [],
-    "layout": {},
-    "frames": []
-}
-
-fig_dict["layout"]["xaxis"] = {'range': [0, 85], 'title': {'text': 'Life Expectancy'}}
-fig_dict["layout"]["yaxis"] = {'title': {'text': 'GDP per Capita'}, 'type': 'log'}
-#fig_dict["layout"]["zaxis"] = {"range": [30, 85], "title": "Life Expectancy"}
-fig_dict["layout"]["hovermode"] = "closest"
-fig_dict["layout"]["updatemenus"] = [
-    {
-        "buttons": [
-            {
-                "args": [None, {"frame": {"duration": 500, "redraw": False},
-                                "fromcurrent": True, "transition": {"duration": 300,
-                                                                    "easing": "quadratic-in-out"}}],
-                "label": "Play",
-                "method": "animate"
-            },
-            {
-                "args": [[None], {"frame": {"duration": 0, "redraw": False},
-                                  "mode": "immediate",
-                                  "transition": {"duration": 0}}],
-                "label": "Pause",
-                "method": "animate"
-            }
-        ],
-        "direction": "left",
-        "pad": {"r": 10, "t": 87},
-        "showactive": False,
-        "type": "buttons",
-        "x": 0.1,
-        "xanchor": "right",
-        "y": 0,
-        "yanchor": "top"
-    }
-]
-
-sliders_dict = {
-    "active": 0,
-    "yanchor": "top",
-    "xanchor": "left",
-    "currentvalue": {
-        "font": {"size": 20},
-        "prefix": "year",
-        "visible": True,
-        "xanchor": "right"
-    },
-    "transition": {"duration": 300, "easing": "cubic-in-out"},
-    "pad": {"b": 10, "t": 50},
-    "len": 0.9,
-    "x": 0.1,
-    "y": 0,
-    "steps": []
-}
-
-# mock data location
-filePath= './droneData_xAxis_newFormat.txt'
-
-# Initializing variables for drone details
-xAxis = []
-yAxis = []
-zAxis = []
-batteryLife = []
-droneLocation = []
-droneId = []
-numberOfDrones = 0
-
-last_time = -1
-with open(filePath) as openFile:
-
-	line = openFile.readline()
-	splitString = line.split('|', 6)
-
-	numberOfDrones = splitString[1]
-	frameCounter = 0
-
-	# Every Formation of Drones
-	while line:
-		frameCounter += 1
-
-		frame = {"data": [], "name": "Frame: " + str(frameCounter)}
-
-
-		for i in range(0, int(numberOfDrones)):
-			line = openFile.readline()
-
-			if line:
-				splitString = line.split('|', 6)
-
-				# data_dict["x"].append(float(splitString[0]))
-				# data_dict["y"].append(float(splitString[1]))
-				# data_dict["z"].append(float(splitString[2]))
-
-				data_dict = {
-						"x": list([float(splitString[0])]),
-						"y": list([float(splitString[1])]),
-						"mode": "markers",
-						"text": list(["cuba"]),
-						"marker": {
-								"sizemode": "area",
-								"sizeref": 200000,
-								"size": list([200]),
-						},
-						"name": "test",
-				}
-				frame["data"].append(data_dict)
-			else: 
-				break
-		if line:
-			fig_dict["frames"].append(frame)
-
-			slider_step = {
-				"args": 
-				[
-					["test"],
-					{
-						"frame": {"duration": 300, "redraw": False},
-						"mode": "immediate",
-						"transition": {"duration": 300}
-					}
-				],
-				"label": "test",
-				"method": "animate"
-			}
-
-			slider_step["label"] = "Step: " + str(frameCounter)
-			sliders_dict["steps"].append(slider_step)
-
-		# Reinitializing the array and saving the last element which belongs to the new upcoming frame
-		xAxis = []
-		yAxis = []
-		zAxis = []
-
-fig_dict["layout"]["sliders"] = [sliders_dict]
-
-fig_dict["data"]=fig_dict["frames"][0]["data"]
-fig = go.Figure({
+Figure({
     'data': [{'marker': {'size': [8425333], 'sizemode': 'area', 'sizeref': 200000},
               'mode': 'markers',
               'name': 'Asia',
@@ -486,8 +343,7 @@ fig = go.Figure({
                                                       500, 'redraw': False},
                                                       'fromcurrent': True,
                                                       'transition': {'duration':
-                                                      300, 'easing': 'quadratic-in-
-                                                      out'}}],
+                                                      300, 'easing': 'quadratic-in-out'}}],
                                              'label': 'Play',
                                              'method': 'animate'},
                                             {'args': [[None], {'frame':
@@ -508,9 +364,3 @@ fig = go.Figure({
                'xaxis': {'range': [30, 85], 'title': {'text': 'Life Expectancy'}},
                'yaxis': {'title': {'text': 'GDP per Capita'}, 'type': 'log'}}
 })
-
-fig.show()
-print(fig)
-
-# Outputs the html file to the specified file
-#pio.write_html(fig, file='./drone_simulation.html', auto_open=True)
