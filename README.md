@@ -11,7 +11,7 @@ To run the program: python main_scatter_plot.py
 
 If it is still not running make sure these are installed:
 
-astroid 2.4.2
+astroid 2.4.2 
 isort 5.5.3
 lazy-object-proxy 1.4.3
 mccabe 0.6.1
