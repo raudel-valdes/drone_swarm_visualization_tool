@@ -20,3 +20,6 @@ If it is still not running make sure these are installed:
   toml              0.10.1 
   wheel             0.33.1 
   wrapt             1.12.1 
+
+# To run the program: 
+python main_scatter_plot.py
