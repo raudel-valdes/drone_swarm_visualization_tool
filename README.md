@@ -6,6 +6,7 @@ Pip3
 Python3
 Plotly 4.10.0
 Pandas
+
 To run the program: python main_scatter_plot.py
 
 If it is still not running make sure these are installed:
