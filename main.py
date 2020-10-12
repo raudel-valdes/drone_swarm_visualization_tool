@@ -9,6 +9,14 @@ class Drone:
 	img = pygame.image.load("images/drone.png")
 	rect = img.get_rect()
 
+	# loads images for battery life
+	battery0 = pygame.image.load("images/battery0.png")
+	battery1 = pygame.image.load("images/battery1.png")
+	battery2 = pygame.image.load("images/battery2.png")
+	battery3 = pygame.image.load("images/battery3.png")
+	battery4 = pygame.image.load("images/battery4.png")
+	batteryRect = battery0.get_rect()
+
 	def __init__(self, id):
 	
 		self.time = []	
@@ -21,6 +29,12 @@ class Drone:
 		self.img = None
 		self.rect = None
 		self.screen_pos = [0, 0] 
+		self.inter_x = None
+		self.inter_y = None
+		self.inter_z = None
+		self.inter_life = None
+
+		self.batteryImg = None
 
 	def mouseCollide(self):
 		x, y = pygame.mouse.get_pos()
@@ -38,9 +52,9 @@ class Drone:
 		global x, y, scale, metersPerUnit, pixelsPerUnit, screen
 
 		if not trail:
-			trailTime = time - time % 1 
+			trailTime = time - time % 5 
 			for i in range(1, 1000):
-				trailTime -= 1 
+				trailTime -= 5 
 				if trailTime < 0:
 					break
 				#self.update(trailTime, True, 100 * (200 - i) / 100)
@@ -72,10 +86,13 @@ class Drone:
 		# interpolates position
 		posX = self.x[i - 1] + interFactor * (self.x[i] - self.x[i-1])
 		posY = self.y[i - 1] + interFactor * (self.y[i] - self.y[i-1])
+		posZ = self.z[i - 1] + interFactor * (self.z[i] - self.z[i-1])
 		pos = pos_to_grid([posX, posY])
 		pos[0] = int(pos[0])
 		pos[1] = int(pos[1])
 
+		# interpolates other info
+		inter_life = self.life[i - 1] + interFactor * (self.life[i] - self.life[i-1])
 						
 		
 
@@ -100,7 +117,29 @@ class Drone:
 			self.rect = self.img.get_rect()
 			self.rect.center = pos
 			screen.blit(self.img, self.rect)
+
+			# displays battery life
+			Drone.batteryRect.center = [pos[0] + 30, pos[1] - 30]
+			batteryImg = Drone.battery0
+			if  inter_life < 5:
+				batteryImg = Drone.battery0
+			elif inter_life < 25: 
+				batteryImg = Drone.battery1
+			elif inter_life < 50:
+				batteryImg = Drone.battery2
+			elif inter_life < 75:
+				batteryImg = Drone.battery3
+			else:
+				batteryImg = Drone.battery4
+			self.batteryImg = batteryImg
+			if pixelsPerUnit > 60:
+				screen.blit(batteryImg, Drone.batteryRect)
+
 			self.screen_pos = pos
+			self.inter_x = posX
+			self.inter_y = posY
+			self.inter_z = posZ
+			self.inter_life = inter_life
 
 			
 
@@ -263,6 +302,9 @@ background = pygame.image.load("images/background.png")
 
 # event loop
 while True:
+
+	mouseClicked = False
+
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			sys.exit()
@@ -378,27 +420,28 @@ while True:
 
 		# left click for measurements
 		else:
-			dx = posX - mousePressedPos[0]
-			dx /= pixelsPerUnit
-			dx *= metersPerUnit
-			dy = posY - mousePressedPos[1]	
-			dy /= pixelsPerUnit
-			dy *= metersPerUnit
-			dist = math.sqrt(dx*dx + dy*dy)
-			txt = font.render(str(round(dist, 1)) + " m", True, (0, 0, 0))	
-			rect = txt.get_rect()
-			perp = unit([dx, dy])
-			perp = [perp[1], -perp[0]]
-			if perp[1] >= 0:
-				perp = [-perp[0], -perp[1]]
-			cenX = ((mousePressedPos[0] + posX) / 2) + perp[0] * 40
-			cenY = ((mousePressedPos[1] + posY) / 2) + perp[1] * 40
-			rect.center = [cenX, cenY]
-			pygame.draw.line(screen, (0, 0, 255), mousePressedPos, (posX, posY), 2)	
-			#beg = (mousePressedPos[0] + perp[0] * 5, mousePressedPos[1] + perp[1] * 4)
-			#end = (mousePressedPos[0] - perp[0] * 5, mousePressedPos[1] - perp[1] * 4)
-			#pygame.draw.line(screen, (0, 0, 255), beg, end, 3)	
-			screen.blit(txt, rect)	
+			if (mousePressedTime > 200):
+				dx = posX - mousePressedPos[0]
+				dx /= pixelsPerUnit
+				dx *= metersPerUnit
+				dy = posY - mousePressedPos[1]	
+				dy /= pixelsPerUnit
+				dy *= metersPerUnit
+				dist = math.sqrt(dx*dx + dy*dy)
+				txt = font.render(str(round(dist, 1)) + " m", True, (0, 0, 0))	
+				rect = txt.get_rect()
+				perp = unit([dx, dy])
+				perp = [perp[1], -perp[0]]
+				if perp[1] >= 0:
+					perp = [-perp[0], -perp[1]]
+				cenX = ((mousePressedPos[0] + posX) / 2) + perp[0] * 40
+				cenY = ((mousePressedPos[1] + posY) / 2) + perp[1] * 40
+				rect.center = [cenX, cenY]
+				pygame.draw.line(screen, (0, 0, 255), mousePressedPos, (posX, posY), 2)	
+				#beg = (mousePressedPos[0] + perp[0] * 5, mousePressedPos[1] + perp[1] * 4)
+				#end = (mousePressedPos[0] - perp[0] * 5, mousePressedPos[1] - perp[1] * 4)
+				#pygame.draw.line(screen, (0, 0, 255), beg, end, 3)	
+				screen.blit(txt, rect)	
 
 	# top tool bar for control of simulation
 	img = pygame.Surface((screen.get_width(), 74), pygame.SRCALPHA)
@@ -419,11 +462,49 @@ while True:
 	pygame.draw.line(screen, (150, 150, 150), (rect.left, screen.get_height()), (rect.left, screen.get_height() / 2), 4)
 	pygame.draw.line(screen, (150, 150, 150), (rect.right, screen.get_height() / 2), (rect.left, screen.get_height() / 2), 4)
 	if selectedDrone:
+		drone = drones[selectedDrone]
 		sel_img = pygame.transform.rotozoom(drones[selectedDrone].img, 0, 2.0)
 		sel_rect = sel_img.get_rect()
-		sel_rect.centerx = rect.centerx
-		sel_rect.top = rect.top + 20
+		sel_rect.centerx = rect.centerx - 10
+		sel_rect.centery = rect.top + 70
 		screen.blit(sel_img, sel_rect)	
+	
+		top_pad = 10	
+		left_pad = 10	
+
+		Drone.batteryRect.top = rect.top + 6 
+		Drone.batteryRect.right = rect.right - left_pad
+		screen.blit(drone.batteryImg, Drone.batteryRect)
+
+		txt_bat = font.render(str(int(drone.inter_life)) + "%", True, (0, 0, 0))	
+		rect_bat = txt_bat.get_rect()
+		rect_bat.bottom = Drone.batteryRect.bottom 
+		rect_bat.right = Drone.batteryRect.left - 4 
+		screen.blit(txt_bat, rect_bat)
+		
+		txt_id = font.render("id: " + str(drone.id), True, (0, 0, 0))	
+		rect_id = txt_id.get_rect()
+		rect_id.top = rect.top +  top_pad + 13
+		rect_id.left = rect.left + left_pad 
+		screen.blit(txt_id, rect_id)
+
+		txt_x = font.render("x: " + str(round(drone.inter_x, 1)) + " m", True, (0, 0, 0))	
+		rect_x = txt_x.get_rect()
+		rect_x.top = rect.top + 130 
+		rect_x.left = rect.left + left_pad 
+		screen.blit(txt_x, rect_x)
+
+		txt_y = font.render("y: " + str(round(drone.inter_y, 1)) + " m", True, (0, 0, 0))	
+		rect_y = txt_y.get_rect()
+		rect_y.top = rect_x.bottom + top_pad 
+		rect_y.left = rect.left + left_pad 
+		screen.blit(txt_y, rect_y)
+
+		txt_z = font.render("z: " + str(round(drone.inter_z, 1)) + " m", True, (0, 0, 0))	
+		rect_z = txt_z.get_rect()
+		rect_z.top = rect_y.bottom + top_pad 
+		rect_z.left = rect.left + left_pad 
+		screen.blit(txt_z, rect_z)
 
 	# slider graphics
 	screen.blit(bar, barRect)
