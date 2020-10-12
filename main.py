@@ -251,6 +251,11 @@ screen = pygame.display.set_mode((1200, 800))
 pygame.display.set_caption("Drone Visualization Tool")
 pygame.display.set_icon(Drone.img)
 
+# check boxes
+checked = pygame.image.load("images/check.png")
+unchecked = pygame.image.load("images/uncheck.png")
+checkedRect = checked.get_rect()
+
 # slider bar for scolling through time
 bar = pygame.image.load("images/bar.png")
 barRect = bar.get_rect()
@@ -265,6 +270,10 @@ playRect = play.get_rect()
 pause = pygame.image.load("images/play.png")
 pauseRect = pause.get_rect()
 playing = False
+
+# checkbox for camera locking
+cameraLocked = True 
+lockBoxRect = checkedRect
 
 
 # used for time simulation 
@@ -289,6 +298,7 @@ drones = load_data(sys.argv[1])
 
 mouseDrag = False
 mouseZoom = False
+mouseZoomY = None
 mousePressed = False
 mousePressedTime = 0
 mouseClicked = False
@@ -297,6 +307,9 @@ selectedDrone = None
 
 # loads background 
 background = pygame.image.load("images/background.png")
+
+
+
 
 
 
@@ -313,6 +326,11 @@ while True:
 				if event.pos[0] >= barRect.left - 20 and event.pos[0] <= barRect.right + 20 and event.pos[1] >= barRect.top and event.pos[1] <= barRect.bottom: 
 					pressedElement = "slider"
 					playing = False
+				elif event.pos[0] >= lockBoxRect.left - 20 and event.pos[0] <= lockBoxRect.right + 20 and event.pos[1] >= lockBoxRect.top and event.pos[1] <= lockBoxRect.bottom: 
+					if cameraLocked:
+						cameraLocked = False
+					else:
+						cameraLocked = True
 				else:
 					pressedElement = "none"
 				mousePressedPos = event.pos
@@ -320,6 +338,7 @@ while True:
 				mousePressedTime = 0.0
 			elif event.button == 2:
 				mouseZoomPos = event.pos
+				mouseZoomY = event.pos[1]
 				mouseZoom = True
 				mouseZoomOrigin = scale
 				mouseZoomCenter = [event.pos[0], event.pos[1]] 
@@ -329,7 +348,6 @@ while True:
 				mouseZoomCenter[1] *= metersPerUnit 
 				mouseZoomCenter[1] /= pixelsPerUnit
 				mouseZoomCenter[1] += y 
-				print(mouseZoomCenter)
 			elif event.button == 3:
 				mouseDragPos = event.pos
 				mouseDragOrigin = [x, y]
@@ -360,9 +378,25 @@ while True:
 
 	# erase screen
 	screen.blit(background, (0, 0))
+
+	# camera locking
+	if cameraLocked and selectedDrone:
+
+		mouseZoomCenter = [drones[selectedDrone].inter_x, drones[selectedDrone].inter_y]
+		mouseZoomPos = [screen.get_width() / 2, screen.get_height() / 2]
+		
+		# aligns center
+		offsetX = screen.get_width() / 2 
+		offsetX /= pixelsPerUnit
+		offsetX *= metersPerUnit
+		offsetY = screen.get_height() / 2 
+		offsetY /= pixelsPerUnit
+		offsetY *= metersPerUnit
+		x = drones[selectedDrone].inter_x - offsetX 
+		y = drones[selectedDrone].inter_y - offsetY
 	
 	# right click mouse drag for repositioning	
-	if mouseDrag:
+	if mouseDrag and not (cameraLocked and selectedDrone):
 		scrollFactor = 1.22
 		posX, posY = pygame.mouse.get_pos()
 		dx = posX - mouseDragPos[0]
@@ -379,7 +413,7 @@ while True:
 	if mouseZoom:
 		zoomFactor = 0.06 
 		posX, posY = pygame.mouse.get_pos()
-		dy = posY - mouseZoomPos[1]	
+		dy = posY - mouseZoomY	
 		dy *= zoomFactor
 		scale = mouseZoomOrigin + zoomFactor * dy
 		if scale < 0.05:
@@ -505,6 +539,19 @@ while True:
 		rect_z.top = rect_y.bottom + top_pad 
 		rect_z.left = rect.left + left_pad 
 		screen.blit(txt_z, rect_z)
+
+		if cameraLocked:
+			lockBoxImage = checked
+		else:
+			lockBoxImage = unchecked
+		lockBoxRect.bottom = rect.bottom - top_pad
+		lockBoxRect.left = rect.left + left_pad
+		screen.blit(lockBoxImage, lockBoxRect)
+		txt_lock = font.render("lock camera", True, (0, 0, 0))	
+		rect_lock = txt_lock.get_rect()
+		rect_lock.bottom = lockBoxRect.bottom - 5
+		rect_lock.left = lockBoxRect.right + 5 
+		screen.blit(txt_lock, rect_lock)
 
 	# slider graphics
 	screen.blit(bar, barRect)
