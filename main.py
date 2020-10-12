@@ -1,10 +1,14 @@
 import pygame
 import sys
 import math
+import numpy as np
 
 class Drone:
 
-	
+
+	img = pygame.image.load("images/drone.png")
+	rect = img.get_rect()
+
 	def __init__(self, id):
 	
 		self.time = []	
@@ -14,18 +18,29 @@ class Drone:
 		self.y = []
 		self.z = []
 		self.life = []
+		self.img = None
+		self.rect = None
+		self.screen_pos = [0, 0] 
 
-		self.img = pygame.image.load("images/drone.png")
-		self.rect = self.img.get_rect()
+	def mouseCollide(self):
+		x, y = pygame.mouse.get_pos()
+		dx = x - self.screen_pos[0]
+		dy = y - self.screen_pos[1]
+		dist = math.sqrt(dx*dx + dy*dy)
+		if dist < 20:
+			return True
+		else:
+			return False
+		
 
 	def update(self, time, trail=False, alpha=0):
 
 		global x, y, scale, metersPerUnit, pixelsPerUnit, screen
 
 		if not trail:
-			trailTime = time - time % 10
+			trailTime = time - time % 1 
 			for i in range(1, 1000):
-				trailTime -= 10 
+				trailTime -= 1 
 				if trailTime < 0:
 					break
 				#self.update(trailTime, True, 100 * (200 - i) / 100)
@@ -54,12 +69,17 @@ class Drone:
 		else:
 			interFactor = (time - before) / (after - before)
 
+		# interpolates position
 		posX = self.x[i - 1] + interFactor * (self.x[i] - self.x[i-1])
 		posY = self.y[i - 1] + interFactor * (self.y[i] - self.y[i-1])
 		pos = pos_to_grid([posX, posY])
 		pos[0] = int(pos[0])
 		pos[1] = int(pos[1])
+
+						
 		
+
+		# draws trail
 		if trail:
 			#pygame.draw.circle(screen, (0, 0, 0), (pos[0], pos[1]), 10)	
 			s = pygame.Surface((4, 4), pygame.SRCALPHA)
@@ -67,13 +87,26 @@ class Drone:
 			#pos[0] -= pos[0] % 10
 			#pos[1] -= pos[1] % 10
 			screen.blit(s, pos)
+
+		# draws drone
 		else:
+
+			# finds angle
+			v1 = [self.x[i], self.y[i]]
+			v1[0] -= self.x[i-1]
+			v1[1] -= self.y[i-1]
+			v2 = [0, -1]	
+			self.img = pygame.transform.rotate(Drone.img, angleBetween(v1, v2))
+			self.rect = self.img.get_rect()
 			self.rect.center = pos
 			screen.blit(self.img, self.rect)
+			self.screen_pos = pos
 
 			
-		
-			
+
+
+def angleBetween(a, b):
+	return 360 * math.atan2( a[0]*b[1] - a[1]*b[0], a[0]*b[0] + a[1]*b[1]) / (2 * math.pi)
 
 
 def load_data(filename):
@@ -172,11 +205,12 @@ def unit(v):
 		
 
 pygame.init()
-font = pygame.font.Font("Azonix.otf", 16)
+font = pygame.font.Font("Azonix.otf", 12)
 
 # sets up screen
-screen = pygame.display.set_mode((1000, 700))
+screen = pygame.display.set_mode((1200, 800))
 pygame.display.set_caption("Drone Visualization Tool")
+pygame.display.set_icon(Drone.img)
 
 # slider bar for scolling through time
 bar = pygame.image.load("images/bar.png")
@@ -204,16 +238,22 @@ x = -20.0
 y = -20.0
 scale = 1.0
 metersPerUnit = 10 
-pixelsPerUnitStart = 100 
+pixelsPerUnitStart = 200 
 pixelsPerUnit = pixelsPerUnitStart 
 clock = pygame.time.Clock()
 
 # read drone data from file
-drones = load_data("data.txt") 
+if len(sys.argv) != 2:
+	print("Program needs exactly 1 arg for data file.")
+	sys.exit()
+drones = load_data(sys.argv[1]) 
 
 mouseDrag = False
 mouseZoom = False
 mousePressed = False
+mousePressedTime = 0
+mouseClicked = False
+selectedDrone = None 
 
 
 # loads background 
@@ -235,6 +275,7 @@ while True:
 					pressedElement = "none"
 				mousePressedPos = event.pos
 				mousePressed = True
+				mousePressedTime = 0.0
 			elif event.button == 2:
 				mouseZoomPos = event.pos
 				mouseZoom = True
@@ -254,6 +295,8 @@ while True:
 		elif event.type == pygame.MOUSEBUTTONUP:
 			if event.button == 1:
 				mousePressed = False 
+				if mousePressedTime < 200: # ms
+					mouseClicked = True
 			elif event.button == 2:
 				mouseZoom = False
 			elif event.button == 3:
@@ -316,6 +359,11 @@ while True:
 	for drone in drones:
 		drone.update(time)
 
+	if mouseClicked:
+		for i in range(0, len(drones)):
+			if drones[i].mouseCollide():
+				selectedDrone = i
+
 	if mousePressed:
 
 		posX, posY = pygame.mouse.get_pos()
@@ -352,14 +400,30 @@ while True:
 			#pygame.draw.line(screen, (0, 0, 255), beg, end, 3)	
 			screen.blit(txt, rect)	
 
-	# top tool bar
+	# top tool bar for control of simulation
 	img = pygame.Surface((screen.get_width(), 74), pygame.SRCALPHA)
-	img.fill((150, 150, 150, 128))
+	img.fill((150, 150, 150, 150))
 	rect = img.get_rect()
 	rect.left = 0
 	rect.top = 0
 	screen.blit(img, rect)
 	pygame.draw.line(screen, (150, 150, 150), (0, rect.bottom), (screen.get_width(), rect.bottom), 4)
+
+	# side tool bar for drone info
+	img = pygame.Surface((200, screen.get_height() / 2), pygame.SRCALPHA)
+	img.fill((150, 150, 150, 150))
+	rect = img.get_rect()
+	rect.right = screen.get_width() 
+	rect.top = screen.get_height() / 2 
+	screen.blit(img, rect)
+	pygame.draw.line(screen, (150, 150, 150), (rect.left, screen.get_height()), (rect.left, screen.get_height() / 2), 4)
+	pygame.draw.line(screen, (150, 150, 150), (rect.right, screen.get_height() / 2), (rect.left, screen.get_height() / 2), 4)
+	if selectedDrone:
+		sel_img = pygame.transform.rotozoom(drones[selectedDrone].img, 0, 2.0)
+		sel_rect = sel_img.get_rect()
+		sel_rect.centerx = rect.centerx
+		sel_rect.top = rect.top + 20
+		screen.blit(sel_img, sel_rect)	
 
 	# slider graphics
 	screen.blit(bar, barRect)
@@ -407,7 +471,10 @@ while True:
 	screen.blit(img, rect)'''
 
 	# keep track of current time in simulation
-	deltaTime = clock.tick() * timeScale
+	trueDelta = clock.tick()
+	if mousePressed and mousePressedTime < 1000:
+		mousePressedTime += trueDelta	
+	deltaTime = trueDelta * timeScale
 	deltaTime /= 1000
 	if playing:
 		time += deltaTime
