@@ -152,10 +152,13 @@ def load_data(filename):
 
 	global maxTime
 	
-	drones = []
 
 	file = open(filename, 'r')
+	if not file:
+		file.close()
+		return False
 
+	drones = []
 	# go through all lines in file skipping header
 	for line in file.readlines()[1:]:
 		line = line.split('|')
@@ -181,7 +184,8 @@ def load_data(filename):
 
 		if drone.time[-1] > maxTime:
 			maxTime = drone.time[-1] 
-			
+	
+	file.close()		
 	return drones
 
 
@@ -615,5 +619,10 @@ while True:
 
 	# display changes
 	pygame.display.flip()
+
+	# update data
+	newDrones = load_data(sys.argv[1]) 
+	if newDrones:
+		drones = newDrones
 
 
