@@ -1,0 +1,57 @@
+#!/bin/bash
+
+## Drone Parameters ##
+export DRONE_ID="2 2"
+export DRONE_IP=192.168.2.3
+export DRONE_IP_SUBMASK=16
+export BATMAN_ESSID=droneSwarm-network
+
+
+
+## DO NOT EDIT BELOW THIS LINE ##
+## BATMAN ADHOC Configuration  ##
+sudo modprobe batman-adv
+echo "Configuring BATMAN ADHOC network"
+sudo ip link set wlan1 down
+sudo ifconfig wlan1 mtu 1532
+sudo iwconfig wlan1 mode ad-hoc
+sudo iwconfig wlan1 essid $BATMAN_ESSID
+sudo iwconfig wlan1 ap any
+sudo iwconfig wlan1 channel 8
+sleep 1s
+sudo ip link set wlan1 up
+sleep 1s
+sudo batctl if add wlan1
+sleep 1s
+sudo ifconfig bat0 up
+sleep 5s
+sudo ifconfig bat0 $DRONE_IP/$DRONE_IP_SUBMASK
+
+## Displays Applied Settings in Main Terminal ##
+echo "BATMAN UP"
+echo DRONE_ID $DRONE_ID
+echo DRONE_IP $DRONE_IP
+echo BATMAN_ESSID $BATMAN_ESSID
+
+## Executes Drones in New Terminal ##
+x-terminal-emulator -e ./build/drones -d "/dev/ttyS0"
+
+##DEBUG##
+#x-terminal-emulator -e gdb ./build/drones -d "/dev/ttyS0"
+
+## Runs Quit Loop in Main Terminal. ON   ##
+## Quit ./build/drones Process is Killed ##
+
+while true; do
+	echo -en "Press Q to Quit:"
+	read input
+if [[ $input = "q" ]] || [[ $input = "Q" ]]
+	then break
+else
+	echo "Invalid Input!"
+fi done
+## Kills Child Process drones ##
+kill $(pgrep -u pi drones)
+
+## Brings BATMAN Interface "bat0" Down ##
+sudo ifconfig bat0 down

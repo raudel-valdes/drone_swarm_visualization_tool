@@ -1,0 +1,9 @@
+# Exclude Everything
+build/obj/
+logs/*
+build/drones
+ide
+.vs
+Temp/
+#Except
+!logs/.gitkeep

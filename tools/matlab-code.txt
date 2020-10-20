@@ -1,0 +1,339 @@
+function [NetOut, NextState]= drone(Net, State, target, num_drones, formationNumber)
+%Set initial variable to hold point to point distances
+distances = zeros(num_drones+1,num_drones+1);
+distances = computeDistances(Net, target);
+
+%Stores the found minimum distance from drones to target
+minDist = min(distances(logical(int64(Net(:,5))), num_drones+1));
+%Looks up lead drone's id by a check for min dist and whether or not the
+%drones are alive.
+leadDrone = 1;
+leadDrone = int64(Net(logical(distances(1:num_drones, num_drones+1) == minDist & int64(Net(:,5)) == 1),6));
+%Finds lead drone's coordinates from drone id.
+leadDroneCoords = Net(leadDrone, 1:3);
+leadDistance = minDist;
+%vector formation follows is found by target minus lead drone location
+formationVector = target - leadDroneCoords;
+
+%init. matrix with size of state change
+
+stateChange = zeros(num_drones,3);
+switch formationNumber
+    case 1
+        stateChange = moveDronesVFormation(Net, formationVector, leadDrone, leadDistance, target, num_drones);
+    case 2
+        stateChange = moveDronesSwarmFormation(Net, formationVector, leadDrone, leadDistance, target, num_drones, distances);
+    case 3
+        stateChange = moveDronesStraightLineFormation(Net, formationVector, leadDrone, leadDistance, target, num_drones);
+    case 4
+        %Looks up lead drone's id by a check for min dist and whether or not the
+        %drones are alive.
+        leadDrone = int64(Net(logical(sum(distances(1:num_drones,1:num_drones)) == min(sum(distances(logical(int64(Net(:,5)) == 1),logical(int64(Net(:,5)) == 1))))),6));
+        %Finds lead drone's coordinates from drone id.
+        leadDroneCoords = Net(leadDrone, 1:3);
+        leadDistance = 1;
+        leadDistance = distances(leadDrone, num_drones+1);
+        %vector formation follows is found by target minus lead drone location
+        formationVector = target - leadDroneCoords;
+        stateChange = moveDronesProtectionFormation(Net, formationVector, leadDrone, leadDistance, target, num_drones);
+end
+%More init. of bullshit variables
+NextState = State;
+NextState(:,7) = zeros(num_drones,1);
+NextState(leadDrone,7) = 1;
+NextState(:,1:3) = State(:,1:3) + stateChange;
+Grounded = logical(NextState(:,3) <= 0);
+NextState(Grounded, 3) = 0;
+
+NetOut = NextState;
+
+function [Distances] = computeDistances(Net, target)
+DroneCoordinates = Net(:,1:3);
+coder.extrinsic('pdist');
+coder.extrinsic('squareform');
+Distances = squareform(pdist(vertcat(DroneCoordinates, target), 'euclidean'));
+
+function [StateChanges] = moveDronesVFormation(Net, formationVector, leadDrone, formationDistance, target, num_drones)
+formationSpeed = 4;
+leadDroneChange = (formationVector/formationDistance);
+leadDrone = leadDrone(1);
+
+v1 = (rotz((45/2)+180) * formationVector')';
+v2 = (rotz(-(45/2)+180) * formationVector')';
+uv1 = v1/norm(v1);
+uv2 = v2/norm(v2);
+
+%Stuff for plotting
+ends = [-leadDroneChange*200;uv1*200;uv2*200] + repmat(Net(leadDrone,1:3),[3 1]);
+simpleLinePlot(Net, leadDrone, ends, target, num_drones)
+%plotting ends
+
+baseChange = zeros(num_drones,3);
+baseChange = repmat(formationVector,[num_drones 1]);
+
+leadDroneCoords = repmat(Net(leadDrone, 1:3), [9 1]);
+a = leadDroneCoords - repmat(formationVector, [9 1]);
+sides = zeros(num_drones, 1);
+sides = ((leadDroneCoords(:,1) - a(:,1)) .* (Net(:,2)-a(:,2)) - (leadDroneCoords(:,2) - a(:,2)) .* (Net(:,1)-a(:,1)));
+
+v1follows = int64(find(sides<0));
+v2follows = int64(find(sides>0));
+vformChange = zeros(num_drones,3);
+l1=0;
+l2=0;
+l1= length(v1follows);
+l2= length(v2follows);
+vformChange(v1follows,:) = repmat(v1, [l1 1]);
+vformChange(v2follows,:) = repmat(v2, [l2 1]);
+vformChange;
+%
+
+leadDroneCoords = zeros(num_drones,3);
+leadDroneCoords = repmat(Net(leadDrone, 1:3),[num_drones 1]);
+vtld = zeros(num_drones,3);
+vtld = leadDroneCoords - Net(:,1:3);
+projVtldFV = zeros(num_drones,3);
+projVtldFV = (dot(vtld, vformChange, 2)/dot(vformChange, vformChange, 2))* vformChange;
+projVtldFV(v1follows,1:2) = [projVtldFV(v1follows,2) projVtldFV(v1follows,1)];
+droneVector = zeros(num_drones,3);
+droneVector = (leadDroneCoords - projVtldFV) - Net(:,1:3);
+
+coder.varsize('StateChanges', [num_drones 3]);
+baseChange = rdivide(baseChange,repmat(magnitudes(baseChange), [1 3]));
+droneVector = rdivide(droneVector,repmat(magnitudes(droneVector), [1 3]));
+StateChanges = (baseChange(1:num_drones,1:3) * formationSpeed) + droneVector(1:num_drones,1:3);
+%StateChanges = rdivide(StateChanges,repmat(magnitudes(StateChanges), [1 3])) * formationSpeed;
+%CollisionAvoidence
+collisionAvoidenceVector = avoidCollisions(Net, StateChanges, num_drones);
+collisionAvoidenceVector = rdivide(collisionAvoidenceVector,repmat(magnitudes(collisionAvoidenceVector), [1 3]));
+%
+
+StateChanges = (baseChange(1:num_drones,1:3) * formationSpeed) + droneVector(1:num_drones,1:3) + collisionAvoidenceVector(1:num_drones, 1:3);
+%StateChanges = rdivide(StateChanges,repmat(magnitudes(StateChanges), [1 3])) * formationSpeed;
+deadDrones = logical(int64(Net(:, 5)) == 0);
+StateChanges(deadDrones, 1:2) = 0;
+StateChanges(deadDrones, 3) = -1;
+
+function [StateChanges] = moveDronesSwarmFormation(Net, formationVector, leadDrone, formationDistance, target, num_drones, distances)
+formationSpeed = 4;
+leadDroneChange = (formationVector/formationDistance);
+leadDrone = leadDrone(1);
+
+v1 = (rotz((45/2)+180) * formationVector')';
+v2 = (rotz(-(45/2)+180) * formationVector')';
+uv1 = v1/norm(v1);
+uv2 = v2/norm(v2);
+
+%Stuff for plotting
+ends = [-leadDroneChange*200;uv1*200;uv2*200] + repmat(Net(leadDrone,1:3),[3 1]);
+simpleLinePlot(Net, leadDrone, ends, target, num_drones)
+%plotting ends
+
+baseChange = zeros(num_drones,3);
+baseChange = repmat(formationVector,[num_drones 1]);
+
+distancesFromLead = zeros(num_drones, 2);
+distanceFromLead = [distances(1:num_drones,leadDrone) Net(:,6)];
+distanceFromLead = sortrows(distanceFromLead, 1);
+v1follows = int64(distanceFromLead(1:2:end,2));
+v2follows = int64(distanceFromLead(2:2:end,2));
+vformChange = zeros(num_drones,3);
+l1=0;
+l2=0;
+l1= length(v1follows);
+l2= length(v2follows);
+vformChange(v1follows,:) = repmat(v1, [l1 1]);
+vformChange(v2follows,:) = repmat(v2, [l2 1]);
+leadDroneCoords = zeros(num_drones,3);
+leadDroneCoords = repmat(Net(leadDrone, 1:3),[num_drones 1]);
+vtld = zeros(num_drones,3);
+vtld = leadDroneCoords - Net(:,1:3);
+projVtldFV = zeros(num_drones,3);
+projVtldFV = (dot(vtld, vformChange, 2)/dot(vformChange, vformChange, 2))* baseChange;
+droneVector = zeros(num_drones,3);
+droneVector = (leadDroneCoords - projVtldFV) - Net(:,1:3);
+
+coder.varsize('StateChanges', [num_drones 3]);
+baseChange = rdivide(baseChange,repmat(magnitudes(baseChange), [1 3]));
+droneVector = rdivide(droneVector,repmat(magnitudes(droneVector), [1 3]));
+StateChanges = (baseChange(1:num_drones,1:3) * formationSpeed) + droneVector(1:num_drones,1:3);
+%StateChanges = rdivide(StateChanges,repmat(magnitudes(StateChanges), [1 3])) * formationSpeed;
+%CollisionAvoidence
+collisionAvoidenceVector = avoidCollisions(Net, StateChanges, num_drones);
+collisionAvoidenceVector = rdivide(collisionAvoidenceVector,repmat(magnitudes(collisionAvoidenceVector), [1 3]));
+%
+
+StateChanges = (baseChange(1:num_drones,1:3) * formationSpeed) + droneVector(1:num_drones,1:3) + collisionAvoidenceVector(1:num_drones, 1:3);
+%StateChanges = rdivide(StateChanges,repmat(magnitudes(StateChanges), [1 3])) * formationSpeed;
+deadDrones = logical(int64(Net(:, 5)) == 0);
+StateChanges(deadDrones, 1:2) = 0;
+StateChanges(deadDrones, 3) = -1;
+
+function [StateChanges] = moveDronesStraightLineFormation(Net, formationVector, leadDrone, formationDistance, target, num_drones)
+formationSpeed = 4;
+leadDroneChange = (formationVector/formationDistance);
+leadDrone = leadDrone(1);
+
+v1 = (rotz((45/2)+180) * formationVector')';
+v2 = (rotz(-(45/2)+180) * formationVector')';
+uv1 = v1/norm(v1);
+uv2 = v2/norm(v2);
+
+%Stuff for plotting
+ends = [-leadDroneChange*200;uv1*200;uv2*200] + repmat(Net(leadDrone,1:3),[3 1]);
+simpleLinePlot(Net, leadDrone, ends, target, num_drones)
+%plotting ends
+
+baseChange = zeros(num_drones,3);
+baseChange = repmat(formationVector,[num_drones 1]);
+leadDroneCoords = zeros(num_drones,3);
+leadDroneCoords = repmat(Net(leadDrone, 1:3),[num_drones 1]);
+vtld = zeros(num_drones,3);
+vtld = leadDroneCoords - Net(:,1:3);
+projVtldFV = zeros(num_drones,3);
+projVtldFV = (dot(vtld, baseChange, 2)/dot(baseChange, baseChange, 2))* baseChange;
+droneVector = zeros(num_drones,3);
+droneVector = (leadDroneCoords - projVtldFV) - Net(:,1:3);
+
+coder.varsize('StateChanges', [num_drones 3]);
+baseChange = rdivide(baseChange,repmat(magnitudes(baseChange), [1 3]));
+droneVector = rdivide(droneVector,repmat(magnitudes(droneVector), [1 3]));
+StateChanges = (baseChange(1:num_drones,1:3) * formationSpeed) + droneVector(1:num_drones,1:3);
+%StateChanges = rdivide(StateChanges,repmat(magnitudes(StateChanges), [1 3])) * formationSpeed;
+%CollisionAvoidence
+collisionAvoidenceVector = avoidCollisions(Net, StateChanges, num_drones);
+collisionAvoidenceVector = rdivide(collisionAvoidenceVector,repmat(magnitudes(collisionAvoidenceVector), [1 3]));
+%
+
+StateChanges = (baseChange(1:num_drones,1:3) * formationSpeed) + droneVector(1:num_drones,1:3) + collisionAvoidenceVector(1:num_drones, 1:3);
+%StateChanges = rdivide(StateChanges,repmat(magnitudes(StateChanges), [1 3])) * formationSpeed;
+deadDrones = logical(int64(Net(:, 5)) == 0);
+StateChanges(deadDrones, 1:2) = 0;
+StateChanges(deadDrones, 3) = -1;
+
+function [StateChanges] = moveDronesProtectionFormation(Net, formationVector, leadDrone, formationDistance, target, num_drones)
+formationSpeed = 4;
+formationDistance = magnitudes(formationVector);
+leadDroneChange = (formationVector/formationDistance);
+leadDrone = leadDrone(1);
+
+v1 = (rotz((45/2)+180) * formationVector')';
+v2 = (rotz(-(45/2)+180) * formationVector')';
+uv1 = v1/norm(v1);
+uv2 = v2/norm(v2);
+
+%Stuff for plotting
+ends = [-leadDroneChange*200;uv1*200;uv2*200] + repmat(Net(leadDrone,1:3),[3 1]);
+simpleLinePlot(Net, leadDrone, ends, target, num_drones)
+%plotting ends
+
+baseChange = zeros(num_drones,3);
+baseChange = repmat(formationVector,[num_drones 1]);
+leadDroneCoords = zeros(num_drones,3);
+leadDroneCoords = repmat(Net(leadDrone, 1:3),[num_drones 1]);
+vtld = zeros(num_drones,3);
+vtld = leadDroneCoords - Net(:,1:3);
+vtld = rdivide(vtld,repmat(magnitudes(vtld), [1 3])) * 13;
+droneVector = zeros(num_drones,3);
+droneVector = (leadDroneCoords - vtld) - Net(:,1:3);
+
+coder.varsize('StateChanges', [num_drones 3]);
+baseChange = rdivide(baseChange,repmat(magnitudes(baseChange), [1 3]));
+droneVector = rdivide(droneVector,repmat(magnitudes(droneVector), [1 3]));
+StateChanges = (baseChange(1:num_drones,1:3) * formationSpeed) + droneVector(1:num_drones,1:3);
+%StateChanges = rdivide(StateChanges,repmat(magnitudes(StateChanges), [1 3])) * formationSpeed;
+%CollisionAvoidence
+collisionAvoidenceVector = avoidCollisions(Net, StateChanges, num_drones);
+collisionAvoidenceVector = rdivide(collisionAvoidenceVector,repmat(magnitudes(collisionAvoidenceVector), [1 3]));
+%
+
+StateChanges = (baseChange(1:num_drones,1:3) * formationSpeed) + droneVector(1:num_drones,1:3) + collisionAvoidenceVector(1:num_drones, 1:3);
+%StateChanges = rdivide(StateChanges,repmat(magnitudes(StateChanges), [1 3])) * formationSpeed;
+deadDrones = logical(int64(Net(:, 5)) == 0);
+StateChanges(deadDrones, 1:2) = 0;
+StateChanges(deadDrones, 3) = -1;
+
+function [CollisionAvoidVector] = avoidCollisions(Net, changeVector, num_drones)
+minColDis = 12;
+coder.extrinsic('pdist');
+X = Net(:,1:3);
+D = zeros(1,36);
+D = pdist(X);
+
+%# find the indices corresponding to each distance
+tmp = ones(size(X,1));
+tmp = tril(tmp,-1); %# creates a matrix that has 1's below the diagonal
+
+%# get the indices of the 1's
+[rowIdx,colIdx] = find(tmp);
+
+%# create the output
+out = [D',Net(rowIdx,:),Net(colIdx,:)];
+
+distlt = D < minColDis;
+%Select the drones which will collide
+selectCollisions = logical(distlt');
+collisions = out(selectCollisions, :);
+collisionDrones = [collisions(:, 7) collisions(:, 14)];
+vbpt = Net(int64(collisionDrones(:,1)),1:3) - Net(int64(collisionDrones(:,2)),1:3);
+dist = magnitudes(vbpt);
+uvbpt = rdivide(vbpt,repmat(dist, [1 3]));
+chvt = uvbpt .* repmat((minColDis - dist), [1 3]);
+
+CollisionAvoidVector = zeros(num_drones, 3);
+CollisionAvoidVector(int64(collisionDrones(:,1)),1:3) = CollisionAvoidVector(int64(collisionDrones(:,1)),1:3) + chvt(:,1:3);
+CollisionAvoidVector(int64(collisionDrones(:,2)),1:3) = CollisionAvoidVector(int64(collisionDrones(:,2)),1:3) - chvt(:,1:3);
+
+%Calculate the Magnitude of a vertical array of Vectors.
+function [magnitude] = magnitudes(vector)
+magnitude = sqrt(sum(vector.^2, 2));
+zeromag = logical(magnitude == 0);
+magnitude(zeromag,:) = 1;
+
+%%
+%Below Follows Code to Plot the drones and the vectors on the graphs
+function [] = simpleLinePlot(Net, leadDrone, ends, target, num_drones)
+p = [Net(leadDrone,1:3); ends(1,:); Net(leadDrone,1:3); ends(2,:); Net(leadDrone,1:3); ends(3,:)];
+
+%Plot 3-D X,Y,Z Plot
+subplot(2,2,1)
+makeGraph(p, num_drones, Net, target)
+hold off
+
+%Plot 3-D X,Y Plot
+subplot(2,2,2)
+makeGraph(p, num_drones, Net, target)
+view([90 0])
+hold off
+
+%Plot 3-D Z,Y Plot
+subplot(2,2,3)
+makeGraph(p, num_drones, Net, target)
+view([0 90])
+hold off
+
+%Plot 3-D Z,X Plot
+subplot(2,2,4)
+makeGraph(p, num_drones, Net, target)
+view([0 0])
+hold off
+
+function [] = makeGraph(linePointPairs, num_drones, Net, target)
+plot3(linePointPairs(:,1), linePointPairs(:,2), linePointPairs(:,3))
+hold on
+pts = zeros(num_drones*2, 3);
+pts(1:2:end, :) = Net(:, 1:3);
+pts(2:2:end, :) = Net(:, 1:3);
+plotPoint(pts, 'b', [0.5,0.5,0.5])
+plotPoint(target, 'r', 'g')
+zlabel('Z'); ylabel('Y'); xlabel('X');
+axis([0 target(1)+100 0 target(2)+100 0 target(3)+100]);
+grid on;
+
+function [] = plotPoint(pt, colorEdge, colorFace)
+plot3(pt(:,1), pt(:,2), pt(:,3), 'gs',...
+    'LineWidth',2,...
+    'MarkerSize',10,...
+    'MarkerEdgeColor',colorEdge,...
+    'MarkerFaceColor',colorFace)
+hold on

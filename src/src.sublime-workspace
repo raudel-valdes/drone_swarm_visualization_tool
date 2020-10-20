@@ -1,0 +1,736 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"nu",
+				"num_alive"
+			],
+			[
+				"get",
+				"getY"
+			],
+			[
+				"pro",
+				"proj_vector_to_lead_fv"
+			],
+			[
+				"num",
+				"num_drones"
+			],
+			[
+				"ve",
+				"vector_to_lead"
+			],
+			[
+				"n",
+				"num_drones"
+			],
+			[
+				"for",
+				"formationVector"
+			],
+			[
+				"Un",
+				"UnitVector"
+			],
+			[
+				"distanc",
+				"distance_size"
+			],
+			[
+				"coll",
+				"collisionDroneMatrix"
+			],
+			[
+				"dist",
+				"distance_size"
+			],
+			[
+				"livin",
+				"livingDrones"
+			],
+			[
+				"liv",
+				"livingDrones"
+			],
+			[
+				"mag",
+				"magnitudeVbpt"
+			],
+			[
+				"begin",
+				"beginend	$1.begin(), $1.end()"
+			],
+			[
+				"lead",
+				"leadDroneCoordinates"
+			],
+			[
+				"lea",
+				"leadDroneCoordinates"
+			],
+			[
+				"dron",
+				"droneVector"
+			],
+			[
+				"dro",
+				"droneVector"
+			],
+			[
+				"dr",
+				"droneVector"
+			],
+			[
+				"base",
+				"baseChange"
+			],
+			[
+				"St",
+				"StateChanges"
+			],
+			[
+				"U",
+				"UnitVector"
+			],
+			[
+				"g",
+				"getX"
+			],
+			[
+				"build",
+				"BUILDDIR"
+			],
+			[
+				"SOURCE",
+				"SOURCEDIR"
+			],
+			[
+				"SOURC",
+				"SOURCEDIR"
+			],
+			[
+				"auto",
+				"autopilot_interface"
+			],
+			[
+				"serial",
+				"serial_port"
+			],
+			[
+				"r",
+				"roll"
+			],
+			[
+				"sys",
+				"sys_status"
+			],
+			[
+				"lo",
+				"local_position_ned"
+			],
+			[
+				"de",
+				"debug"
+			],
+			[
+				"bau",
+				"baudrate"
+			],
+			[
+				"ua",
+				"uart_name_"
+			],
+			[
+				"uar",
+				"uart_name"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/C/cygwin64/home/arn68412/git/drone-swarm/tools/matlab-code.txt",
+			"settings":
+			{
+				"buffer_size": 13902,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "main.cpp",
+			"settings":
+			{
+				"buffer_size": 2205,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "vector3d.h",
+			"settings":
+			{
+				"buffer_size": 1596,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "mavlink_control.cpp",
+			"settings":
+			{
+				"buffer_size": 7790,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "fileio.h",
+			"settings":
+			{
+				"buffer_size": 870,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "fileio.cpp",
+			"settings":
+			{
+				"buffer_size": 1870,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"Packages/Makefile/Make.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Program Files (x86)/Steam/steamapps/common/Starbound/giraffe_storage/mods/mods_go_here",
+		"/C/Users/arn68412/Desktop/abandoned_mineshaft.json",
+		"/C/Users/arn68412/Desktop/nx/Makefile",
+		"/C/Users/arn68412/Desktop/spelunky_1_1_src/spelunky.gmk",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/mavlink_control.h",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/serial_port.h",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/src.sublime-project",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/fileio.cpp",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/vector3d.h",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/vector3d.cpp",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/fileio.h",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/drone.cpp",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/main.cpp",
+		"/C/Users/arn68412/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/test.cpp",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/#autopilot_interface.cpp#",
+		"/C/cygwin64/home/arn68412/git/cavestory-sdl2/Jamfile",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/.gitignore",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/tools/matlab-code.txt",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/tools/.matlab-code.txt.swp",
+		"/C/Users/arn68412/Desktop/matlab-code.txt",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/drone.h",
+		"/C/cygwin64/home/arn68412/.inputrc",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/socket.h",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/mavlink_control.cpp",
+		"/C/Users/arn68412/Desktop/DroneSwarm Spring 2015/DroneSwarm Spring 2015/Software/DroneSwarm (Old)/Network.cpp",
+		"/C/Users/arn68412/Desktop/Simulation - FINAL/Simulation - FINAL/animation.slx.r2013a",
+		"/C/Users/arn68412/Desktop/Simulation - FINAL/Simulation - FINAL/drones.slx",
+		"/C/Users/arn68412/Desktop/Simulation - FINAL/Simulation - FINAL/README.md",
+		"/C/Users/arn68412/Desktop/DroneSwarm Spring 2015/DroneSwarm Spring 2015/Software/DroneSwarm-dev/DroneSwarm-dev/Swarm.cpp",
+		"/C/Users/arn68412/Desktop/DroneSwarm Spring 2015/DroneSwarm Spring 2015/Software/DroneSwarm-dev/DroneSwarm-dev/README.md",
+		"/C/Users/arn68412/Desktop/DroneSwarm Spring 2015/DroneSwarm Spring 2015/Software/DroneSwarm-dev/DroneSwarm-dev/networkSetup.sh",
+		"/C/Users/arn68412/Desktop/DroneSwarm Spring 2015/DroneSwarm Spring 2015/Software/DroneSwarm (Old)/Drone.cpp",
+		"/C/Users/arn68412/Desktop/DroneSwarm Spring 2015/DroneSwarm Spring 2015/Software/DroneSwarm (Old)/Coordinator class/Coordinator.hpp",
+		"/C/Users/arn68412/Desktop/DroneSwarm Spring 2015/DroneSwarm Spring 2015/Software/DroneSwarm (Old)/Makefile",
+		"/C/Users/arn68412/Desktop/DroneSwarm Spring 2015.zip",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/serial_port.cpp",
+		"/C/Users/arn68412/Desktop/Downloads/413697a0.ris",
+		"/C/Users/arn68412/Google Drive/11/RIG/DroneSwarmReport_ZEJ.pdf",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/makefile",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/.gitattributes",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/.gitmodules",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/autopilot_interface.cpp",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/src/autopilot_interface.cpp",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/serial_port.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink_control.cpp",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink_control.h",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/build/makefile",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/autopilot_interface.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/makefile",
+		"/C/cygwin64/home/arn68412/git/drone-swarm/README.md",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/.gitmodules",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/common/mavlink_msg_sys_status.h",
+		"/C/Users/arn68412/Documents/GitHub/cps/.gitmodules",
+		"/C/Users/arn68412/Documents/GitHub/cps/README.md",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/common/mavlink_msg_attitude.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/common/common.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/serial_port.cpp",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/common/mavlink_msg_heartbeat.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/common/mavlink_msg_local_position_ned.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/protocol.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/mavlink_helpers.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/common/testsuite.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/common/mavlink.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/mavlink_types.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink/include/mavlink/v1.0/common/mavlink_msg_autopilot_version.h",
+		"/C/cygwin64/home/arn68412/git/c_uart_interface_example/mavlink_control"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			".",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"position_file_two",
+			"collisionav",
+			".getX",
+			"tempCounter",
+			"AvoidColl",
+			"Net",
+			"repmat",
+			"base_change",
+			" vector_to_lead",
+			"vector_to_lead",
+			"lead_coords[i]",
+			"leadDroneCoordinates",
+			"lead_coords",
+			"base",
+			"projVectorToLeadDroneFV",
+			"9",
+			"baseChange",
+			"leadDroneCoords",
+			"vectorToLeadDrone",
+			"v1follows",
+			"l2",
+			"l1",
+			" vector<",
+			" vector ",
+			"leadDroneChange",
+			"vector",
+			"repmatFormationVector",
+			"changeVector",
+			"unknowsize",
+			"x",
+			"numDronesLiving",
+			"->",
+			"distance",
+			"new",
+			"droneCounter",
+			"v2folllows",
+			"v1folllows",
+			"counter",
+			"uv1",
+			"counter",
+			"vector",
+			"repmat",
+			"quit_handler",
+			"stop",
+			"handle_quit",
+			"SIGINT",
+			"quit_handler",
+			"serial_port_quit",
+			"signal",
+			"quit_handler",
+			"quit",
+			"serial_port_quit",
+			"#define port",
+			"port",
+			"ip address",
+			"#include \"mavlink_control.h\"",
+			"parse_commandline",
+			"commands",
+			"top",
+			"main_n",
+			"top",
+			"time",
+			"serial",
+			"();\n",
+			"start_write_thread",
+			"mavlink_attitude_t",
+			"current_messages.attitude",
+			"attitude",
+			"heartbea",
+			"attitude",
+			"          \n",
+			"got message local_",
+			"debug",
+			"Time_Stamps",
+			"Mavlink_Messages",
+			"current_messages",
+			"mavlink_msg_heartbeat_decode",
+			"MAVLINK_MSG_ID_BATTERY_STATUS",
+			"MAVLINK_MSG_ID_SYS_STATUS",
+			"MAVLINK_MSG_ID_HEARTBEAT",
+			"switch",
+			"read_message",
+			"parse_commandline",
+			"debug",
+			"parse_commandline",
+			"debug",
+			"local_position_ned"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"j",
+			"lead_coords",
+			"proj_vector_to_lead_fv",
+			"base_change",
+			"lead_coords",
+			"vector_to_lead",
+			" std::vector<",
+			"unknown_size",
+			"num_alive",
+			"v2follows",
+			"v1follows",
+			"i"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/C/cygwin64/home/arn68412/git/drone-swarm/tools/matlab-code.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13902,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								444,
+								444
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Matlab/Matlab.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "main.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2205,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1333,
+								1333
+							]
+						],
+						"settings":
+						{
+							"rulers":
+							[
+								80
+							],
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 148.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "vector3d.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1596,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								605,
+								605
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "mavlink_control.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7790,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2869.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "fileio.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 870,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								725,
+								725
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "fileio.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1870,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1834,
+								1834
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 583.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "src.sublime-project",
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 201.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
